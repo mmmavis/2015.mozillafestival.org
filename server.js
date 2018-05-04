@@ -32,32 +32,34 @@ app.use(express.static(path.resolve(__dirname, `public`)));
 app.use(bodyParser.json());
 
 app.post(`/add-proposal`, limiter, (req, res) => {
+  res.json(req.body);
+
   // line breaks are essential for the private key.
   // if reading this private key from env var this extra replace step is a MUST
-  var GOOGLE_API_CRED = {
-    email: env.get(`GOOGLE_API_CLIENT_EMAIL_2017`),
-    key: env.get(`GOOGLE_API_PRIVATE_KEY_2017`).replace(/\\n/g, `\n`)
-  };
-  var SPREADSHEET_ID = env.get(`PROPOSAL_SPREADSHEET_ID_2017`);
+  // var GOOGLE_API_CRED = {
+  //   email: env.get(`GOOGLE_API_CLIENT_EMAIL_2017`),
+  //   key: env.get(`GOOGLE_API_PRIVATE_KEY_2017`).replace(/\\n/g, `\n`)
+  // };
+  // var SPREADSHEET_ID = env.get(`PROPOSAL_SPREADSHEET_ID_2018`);
 
-  proposalHandler.postToSpreadsheet(req.body, SPREADSHEET_ID, GOOGLE_API_CRED, (err, proposal) => {
-    if (err) res.status(500).json(err);
+  // proposalHandler.postToSpreadsheet(req.body, SPREADSHEET_ID, GOOGLE_API_CRED, (err, proposal) => {
+  //   if (err) res.status(500).json(err);
 
-    proposalHandler.postToGithub({
-      token: env.get(`GITHUB_BOT_TOKEN_2017`),
-      owner: env.get(`GITHUB_REPO_OWNER_2017`),
-      repo: env.get(`GITHUB_REPO_NAME_2017`)
-    }, proposal, (githubErr, issueNum) => {
-      if (githubErr) res.status(500).json(githubErr);
+  //   proposalHandler.postToGithub({
+  //     token: env.get(`GITHUB_BOT_TOKEN_2017`),
+  //     owner: env.get(`GITHUB_REPO_OWNER_2017`),
+  //     repo: env.get(`GITHUB_REPO_NAME_2017`)
+  //   }, proposal, (githubErr, issueNum) => {
+  //     if (githubErr) res.status(500).json(githubErr);
 
-      var rowData = { uuid: proposal.uuid, githubissuenumber: issueNum};
-      proposalHandler.updateSpreadsheetRow(rowData, SPREADSHEET_ID, GOOGLE_API_CRED, (updateError) => {
-        if (updateError) res.status(500).json(updateError);
+  //     var rowData = { uuid: proposal.uuid, githubissuenumber: issueNum};
+  //     proposalHandler.updateSpreadsheetRow(rowData, SPREADSHEET_ID, GOOGLE_API_CRED, (updateError) => {
+  //       if (updateError) res.status(500).json(updateError);
 
-        res.send(`Success!`);
-      });
-    });
-  });
+  //       res.send(`Success!`);
+  //     });
+  //   });
+  // });
 });
 
 app.post('/add-fringe-event', limiter, (req, res) => {

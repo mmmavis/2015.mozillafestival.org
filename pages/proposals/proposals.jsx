@@ -38,6 +38,8 @@ var Proposal = React.createClass({
     event.preventDefault();
 
     this.refs.formPartOne.validates(partOneIsValid => {
+      console.log(`partOneIsValid`, partOneIsValid);
+
       this.refs.formPartTwo.validates(partTwoIsValid => {
         this.refs.formPartThree.validates(partThreeIsValid => {
           this.refs.formPartFour.validates(partFourIsValid => {
