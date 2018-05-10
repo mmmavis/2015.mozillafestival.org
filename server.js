@@ -13,6 +13,10 @@ import { renderToString } from 'react-dom/server';
 import { StaticRouter } from 'react-router';
 import Main from './main.jsx';
 
+
+import { google } from 'googleapis';
+
+
 Habitat.load();
 
 var app = express(),
@@ -30,6 +34,88 @@ var limiter = RateLimit({
 app.use(compression());
 app.use(express.static(path.resolve(__dirname, `public`)));
 app.use(bodyParser.json());
+
+
+// https://developers.google.com/sheets/api/guides/authorizing
+const GOOGLE_API_SCOPE = [
+  `https://www.googleapis.com/auth/spreadsheets`
+];
+
+// Create JWT auth object
+const jwt = new google.auth.JWT(
+  env.get(`GOOGLE_API_CLIENT_EMAIL_2018`),
+  null,
+  env.get(`GOOGLE_API_PRIVATE_KEY_2018`).replace(/\\n/g, `\n`),
+  GOOGLE_API_SCOPE
+);
+
+
+// Authorize
+jwt.authorize((err, authData) => {
+  if (err) {
+    throw err;
+  }
+  console.log('You have been successfully authenticated: ', authData);
+  console.log(`\n\n\n`);
+
+  const sheets = google.sheets('v4');
+
+  var values = [
+    [
+      // Cell values ...
+      `hi`
+    ],
+    // Additional rows ...
+  ];
+
+  // Additional ranges to update ...
+  var body = {
+    values: values,
+    // range: 'Sheet1!A2',
+    // includeValuesInResponse: `true`,
+    // responseDateTimeRenderOption: `FORMATTED_STRING`,
+    // responseValueRenderOption: `FORMATTED_VALUE`,
+    // valueInputOption: `RAW`,
+  };
+
+  sheets.spreadsheets.values.update({
+    auth: jwt,
+    spreadsheetId: '1Td8EOJi6a8VlDSJAmLdNIcV9iT9PhxlYjVDlxEsYGK4',
+    range: 'Sheet1!A2',
+    // includeValuesInResponse: `true`,
+    // responseDateTimeRenderOption: `FORMATTED_STRING`,
+    // responseValueRenderOption: `FORMATTED_VALUE`,
+    valueInputOption: `RAW`,
+    resource: body
+  }, (error, res) => {
+    if (error) {
+      console.error('The API returned an error.');
+      console.log(error);
+      // throw error;
+    }
+
+    console.log(`///////////`);
+    console.log(res);
+    // const rows = res.data.values;
+    // if (rows.length === 0) {
+    //   console.log('No data found.');
+    // } else {
+    //   console.log('Name, Major:');
+    //   for (const row of rows) {
+    //     // Print columns A and E, which correspond to indices 0 and 4.
+    //     console.log(`${row[0]}, ${row[4]}`);
+    //   }
+    // }
+  });
+
+
+});
+
+
+
+
+
+
 
 app.post(`/add-proposal`, limiter, (req, res) => {
   res.json(req.body);

@@ -2,6 +2,7 @@ import React from 'react';
 import { Switch, Route } from 'react-router';
 import NotFound from './pages/not-found.jsx';
 import ProposalsPage from './pages/proposals/proposals.jsx';
+import TestPage from './pages/proposals/test.jsx';
 import EnglishStrings from './pages/proposals/language/english.json';
 import HousePage from './pages/house.jsx';
 import Header from './components/header.jsx';
@@ -13,6 +14,7 @@ const Routes = () => (
   <Switch>
     <Route exact path="/" component={require(`./pages/home.jsx`)} />
     <Route exact path="/proposals" component={ProposalEnglish} />
+    <Route path="/test" component={TestPage} />
     <Route path="/location" component={require(`./pages/location.jsx`)} />
     <Route path="/about" component={require(`./pages/about.jsx`)} />
     <Route path="/contact" component={require(`./pages/contact.jsx`)} />
